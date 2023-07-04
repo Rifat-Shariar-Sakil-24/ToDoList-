@@ -1,7 +1,9 @@
 const { response } = require("express");
 
 document.addEventListener('DOMContentLoaded',function(){
-   
+    fetch('http://localhost:5500/getAll')
+    .then(response => response.json())
+    .then(data => console.log(data));
     loadHTMLTable([]);
 });
 

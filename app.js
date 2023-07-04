@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-
+const dbService = require('./dbService');
 
 app.use(cors());
 app.use(express.json());
@@ -19,8 +19,11 @@ app.post('/insert', (request, response) => {
 
 //read
 app.get('/getAll', (request, response)=>{
-   
-   console.log('test');
+    const db = dbService.getDbServiceInstance();
+    
+    response.json({
+        success: true
+    })
 });
 
 app.listen(process.env.PORT, () => console.log('app is running'));
