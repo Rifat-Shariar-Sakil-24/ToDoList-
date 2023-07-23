@@ -1,48 +1,54 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/style.css">
-  <title>Login</title>
+  <title>Registration</title>
 </head>
 <body>
-  <h1>Login</h1>
-  <form id="login-form">
+  <h1>Registration</h1>
+  <form id="register-form">
     <input type="text" id="username-input" placeholder="Username" required>
     <input type="password" id="password-input" placeholder="Password" required>
-    <button type="submit">Login</button>
+    <p id="error-message" class="error-message"></p>
+    <button type="submit">Register</button>
   </form>
-  <p>Don't have an account? <a href="/register">Register</a></p>
+  <p>Already have an account? <a href="/login">Login</a></p>
   <script src="../public/script.js"></script>
   <script>
-    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
     const usernameInput = document.getElementById('username-input');
     const passwordInput = document.getElementById('password-input');
+    const errorMessage = document.getElementById('error-message');
 
-    loginForm.addEventListener('submit', (event) => {
+    registerForm.addEventListener('submit', (event) => {
       event.preventDefault();
 
       const username = usernameInput.value.trim();
       const password = passwordInput.value.trim();
 
-      fetch('/login', {
+      fetch('/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ username, password })
       })
-        .then(response => response.json())
-        .then(data => {
-          // Store the token in local storage
-          localStorage.setItem('token', data.token);
-
-          // Redirect to the to-do list page
-          window.location.href = '/';
+        .then(response => {
+          if (response.status === 409) {
+            return response.text();
+          } else if (response.status === 200) {
+            // Redirect to the login page
+            window.location.href = '/login';
+          } else {
+            throw new Error('Registration failed.');
+          }
         })
-        .catch(error => console.error('Error logging in:', error));
+        .then(data => {
+          errorMessage.textContent = data;
+        })
+        .catch(error => console.error('Error registering user:', error));
     });
   </script>
 </body>
