@@ -1,4 +1,3 @@
-
 // Fetch tasks from the server and render them
 function fetchTasks() {
   fetch('/tasks', {
@@ -19,7 +18,7 @@ function fetchTasks() {
         const editButton = document.createElement('button');
         editButton.textContent = 'Edit';
         editButton.addEventListener('click', () => {
-          editTask(task.id, task.task);
+          editTask(task.id, span);
         });
 
         const deleteButton = document.createElement('button');
@@ -56,24 +55,70 @@ function addTask(task) {
 }
 
 // Edit a task
-function editTask(taskId, task) {
-  const updatedTask = prompt('Update the task:', task);
-  if (updatedTask !== null && updatedTask.trim() !== '') {
-    fetch(`/tasks/${taskId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({ task: updatedTask })
+function editTask(taskId, taskElement) {
+  const taskText = taskElement.textContent;
+  const taskWidth = window.getComputedStyle(taskElement).width;
+
+  // Create an input element
+  const taskInput = document.createElement('input');
+  taskInput.type = 'text';
+  taskInput.value = taskText;
+  taskInput.style.width = taskWidth;
+
+  // Create a container element
+  const container = document.createElement('div');
+  container.classList.add('task-container');
+  container.appendChild(taskInput);
+
+  // Replace the task element with the container
+  taskElement.parentNode.replaceChild(container, taskElement);
+
+  // Set the focus to the input element
+  taskInput.focus();
+
+  // Handle input blur event
+  taskInput.addEventListener('blur', () => {
+    const updatedTask = taskInput.value.trim();
+    if (updatedTask !== '') {
+      updateTask(taskId, updatedTask);
+    } else {
+      // Restore the original task text if the input is empty
+      taskInput.value = taskText;
+    }
+    // Replace the container with the original task element
+    container.parentNode.replaceChild(taskElement, container);
+  });
+
+  // Handle input keydown event
+  taskInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      taskInput.blur();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      taskInput.value = taskText;
+      taskInput.blur();
+    }
+  });
+}
+
+
+// Update a task
+function updateTask(taskId, task) {
+  fetch(`/tasks/${taskId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
+    body: JSON.stringify({ task })
+  })
+    .then(response => {
+      if (response.status === 200) {
+        fetchTasks();
+      }
     })
-      .then(response => {
-        if (response.status === 200) {
-          fetchTasks();
-        }
-      })
-      .catch(error => console.error('Error updating task:', error));
-  }
+    .catch(error => console.error('Error updating task:', error));
 }
 
 // Delete a task
