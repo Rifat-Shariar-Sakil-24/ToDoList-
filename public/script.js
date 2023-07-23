@@ -59,37 +59,29 @@ function editTask(taskId, taskElement) {
   const taskText = taskElement.textContent;
   const taskWidth = window.getComputedStyle(taskElement).width;
 
-  // Create an input element
   const taskInput = document.createElement('input');
   taskInput.type = 'text';
   taskInput.value = taskText;
   taskInput.style.width = taskWidth;
 
-  // Create a container element
   const container = document.createElement('div');
   container.classList.add('task-container');
   container.appendChild(taskInput);
 
-  // Replace the task element with the container
   taskElement.parentNode.replaceChild(container, taskElement);
 
-  // Set the focus to the input element
   taskInput.focus();
 
-  // Handle input blur event
   taskInput.addEventListener('blur', () => {
     const updatedTask = taskInput.value.trim();
     if (updatedTask !== '') {
       updateTask(taskId, updatedTask);
     } else {
-      // Restore the original task text if the input is empty
       taskInput.value = taskText;
     }
-    // Replace the container with the original task element
     container.parentNode.replaceChild(taskElement, container);
   });
 
-  // Handle input keydown event
   taskInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -101,7 +93,6 @@ function editTask(taskId, taskElement) {
     }
   });
 }
-
 
 // Update a task
 function updateTask(taskId, task) {
@@ -149,5 +140,20 @@ taskForm.addEventListener('submit', (event) => {
   }
 });
 
-// Fetch tasks when the page loads
-fetchTasks();
+
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/login';
+}
+
+const logoutButton = document.getElementById('logout-btn');
+logoutButton.addEventListener('click', () => {
+  logout();
+});
+
+const token = localStorage.getItem('token');
+if (token) {
+  fetchTasks();
+} else {
+  window.location.href = '/login';
+}

@@ -1,4 +1,4 @@
-
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +9,9 @@
 </head>
 <body>
   <h1>To-Do List</h1>
+  <div>
+    <button id="logout-btn">Logout</button>
+  </div>
   <form id="task-form">
     <input type="text" id="task-input" placeholder="Add a task" required>
     <button type="submit">Add Task</button>
@@ -16,9 +19,17 @@
   <ul id="task-list"></ul>
   <script src="script.js"></script>
   <script>
+    // Logout function
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      // Clear the token from local storage
+      localStorage.removeItem('token');
+      // Redirect to the login page
+      window.location.href = '/login';
+    });
+
+    // Check if token is present, fetch tasks directly
     const token = localStorage.getItem('token');
     if (token) {
-      // Token is already present, fetch tasks directly
       fetchTasks();
     } else {
       // Token is not present, redirect to the login page
