@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const dotenv = require('dotenv');
+//const { rejects } = require('assert');
 let instance = null;
 dotenv.config();
 
@@ -23,12 +24,40 @@ class DbService {
         return instance ? instance : new DbService();
     }
     async getAllData() {
-        try{
-           const response = await new Promise((resolve))
+        
+        try {
+           const response = await new Promise((resolve, reject) => {
+                const query = "SELECT * FROM names;";
+                connection.query(query, (err, results) =>{
+                     if(err) reject(new Error(err.message));
+                     resolve(results);
+                })
+           });
+           
+           return response;
+         // console.log(response);
         } catch(error){
              console.log(error);
         }
     }
+
+    // async insertNewName(name){
+    //     try{
+    //         const dateAdded = new Date();
+    //         const insertID = await new Promise((resolve, reject) => {
+    //             const query = "INSERT INTO names (name,date_added) VALUES (?,?);";
+    //             connectio.query(query, [name, dateAdded], (err, result) =>{
+    //                  if(err) reject(new Error(err.message));
+    //                  resolve(result.insertID);
+    //             })
+    //        });
+    //        console.log(insertID);
+    //        //return response;
+
+    //     } catch(error){
+    //         console.log(error);
+    //     }
+    // }
 }
 
 module.exports = DbService;
